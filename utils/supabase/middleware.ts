@@ -40,22 +40,17 @@ export const updateSession = async (request: NextRequest) => {
     const userResult = await supabase.auth.getUser();
     const user = userResult.data.user;
 
-    // If the user is not authenticated and is trying to access protected routes, redirect to sign-in.
     if (request.nextUrl.pathname.startsWith("/protected") && !user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    // If user is authenticated and they hit the root URL,
-    // query their role and redirect accordingly.
     if (request.nextUrl.pathname === "/protected" && user) {
-      // Query the users table for the user's role
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("role")
         .eq("id", user.id)
         .single();
 
-      // In case of error or if no role is returned, you could fallback to a default redirect.
       if (userError || !userData) {
         return NextResponse.redirect(new URL("/student", request.url));
       }
