@@ -4,12 +4,21 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { error } from "console";
 
 export const signUpAction = async (formData: FormData) => {
+  const username = formData.get("username")?.toString();
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
+  const role = Number(formData.get("role"));
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
+  const roleString = (role == 0) ? "admin" : "student";
+
+  console.log(`username: ${username}`);
+  console.log(`email: ${email}`);
+  console.log(`password: ${password}`);
+  console.log(`role: ${role}`);
 
   if (!email || !password) {
     return encodedRedirect(
@@ -19,11 +28,11 @@ export const signUpAction = async (formData: FormData) => {
     );
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data: authData, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback`,
+      emailRedirectTo: `${origin}/auth/callback?role=${roleString}`,
     },
   });
 
@@ -31,9 +40,24 @@ export const signUpAction = async (formData: FormData) => {
     console.error(error.code + " " + error.message);
     return encodedRedirect("error", "/sign-up", error.message);
   } else {
+    const userId = authData?.user?.id;
+    const { error: insertError } = await supabase.from("users").insert([
+      {
+        id: userId,
+        email: authData?.user?.email,
+        name: username,
+        role: roleString,
+      }
+    ])
+
+    if (insertError) {
+      console.error("Insert Error:", insertError.message);
+      return encodedRedirect("error", "/sign-up", insertError.message);
+    }
+
     return encodedRedirect(
       "success",
-      "/sign-up",
+      "/register",
       "Thanks for signing up! Please check your email for a verification link.",
     );
   }
@@ -44,17 +68,191 @@ export const signInAction = async (formData: FormData) => {
   const password = formData.get("password") as string;
   const supabase = await createClient();
 
+  console.log(`email login: ${email}`);
+
   const { error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
+  const { data } = await supabase.from('users').select("role").eq('email', email).single();
+
   if (error) {
     return encodedRedirect("error", "/sign-in", error.message);
   }
 
-  return redirect("/protected");
+  if (data?.role == "admin") {
+    return redirect("/admin");
+  } else {
+    return redirect("/student");
+  }
 };
+
+export const addQuiz = async (formData: FormData) => {
+  type OptionType = {
+    question: string;
+    opsi: string[];
+    option: boolean[];
+  };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
+  const title = formData.get("title")?.toString();
+  const description = formData.get("description")?.toString();
+
+  const { data: quizData, error: insertError } = await supabase.from("quizzes").insert([
+    {
+      title: title,
+      description: description,
+      admin_id: user?.id
+    }
+  ]).select("id").single();
+
+  const quizId = quizData?.id;
+
+  for (let ops of opsi) {
+    const { data: questionData, error: erro } = await supabase
+      .from("questions")
+      .insert([{ quiz_id: quizId, question_text: ops.question }])
+      .select("id")
+      .single();
+
+    if (erro) {
+      console.error("Error inserting question:", erro);
+    } else if (!questionData) {
+      console.error("Question insert returned null");
+    }
+
+    const questionId = questionData?.id;
+
+    if (!questionId) {
+      console.error("Skipping answer choices due to missing question ID");
+      continue;
+    }
+
+    for (let x = 0; x < 4; x++) {
+      const { error: answerError } = await supabase
+        .from("answer_choices")
+        .insert([
+          {
+            question_id: questionId,
+            choice_text: ops.opsi[x],
+            is_correct: ops.option[x],
+          },
+        ]);
+
+      if (answerError) {
+        console.error("Error inserting answer choice:", answerError);
+      }
+    }
+  }
+
+  return redirect("/admin/quizzes");
+}
+
+export const editQuiz = async (formData: FormData) => {
+  type OptionType = {
+    id: string;
+    question_text: string;
+    opsi: string[];
+    option: boolean[];
+  };
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
+  const title = formData.get("title")?.toString();
+  const description = formData.get("description")?.toString();
+  const quizId = formData.get("quizId")?.toString();
+  let questionSebelumnya: OptionType[] = [];
+  console.log(JSON.stringify(opsi, null, 2));
+
+  if (!quizId || !user?.id) {
+    console.error("Missing quiz ID or user ID");
+    return;
+  }
+
+  const { data: updatedQuiz, error: quizError } = await supabase
+    .from("quizzes")
+    .update({
+      title: title,
+      description: description,
+      admin_id: user.id,
+    })
+    .eq("id", quizId)
+  if (quizError) {
+    console.error("Error updating quiz:", quizError);
+    return;
+  } else {
+    console.log("Quiz updated successfully:", updatedQuiz);
+  }
+
+  const {data: quesSebelum} = await supabase.from("questions").select("*").eq("quiz_id", quizId);
+  if (quesSebelum){
+    questionSebelumnya = quesSebelum;
+    console.log(`sebelumnya: ${JSON.stringify(questionSebelumnya, null, 2)}`);
+  }
+
+  for (let x = 0; x < questionSebelumnya.length; x++){
+    console.log(`quesId: ${questionSebelumnya[x].id}`)
+    const { data, error: deleteError } = await supabase
+    .from("questions")
+    .delete()
+    .eq("id", questionSebelumnya[x].id); 
+
+    if (data){
+      console.log(`deleted data: ${data}`);
+    }
+
+    if (deleteError){
+      console.log(`error delete: ${JSON.stringify(deleteError, null, 2)}`);
+    }
+  }
+  
+  for (let ops of opsi) {
+    const { data: questionData, error: erro } = await supabase
+      .from("questions")
+      .insert([{ quiz_id: quizId, question_text: ops.question_text }])
+      .select("id")
+      .single();
+
+    if (erro) {
+      console.error("Error inserting question:", erro);
+    } else if (!questionData) {
+      console.error("Question insert returned null");
+    }
+
+    const questionId = questionData?.id;
+
+    if (!questionId) {
+      console.error("Skipping answer choices due to missing question ID");
+      continue;
+    }
+
+    for (let x = 0; x < 4; x++) {
+      const { error: answerError } = await supabase
+        .from("answer_choices")
+        .insert([
+          {
+            question_id: questionId,
+            choice_text: ops.opsi[x],
+            is_correct: ops.option[x],
+          },
+        ]);
+
+      if (answerError) {
+        console.error("Error inserting answer choice:", answerError);
+      }
+    }
+  }
+
+  return redirect("/admin/quizzes");
+}
 
 export const forgotPasswordAction = async (formData: FormData) => {
   const email = formData.get("email")?.toString();

@@ -59,6 +59,11 @@
   }
 }
 
+.scroll-container {
+  overflow-y: scroll; 
+  scrollbar-width: none; 
+}
+
 @layer base {
   * {
     @apply border-border;
