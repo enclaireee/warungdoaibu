@@ -75,11 +75,11 @@ export const signInAction = async (formData: FormData) => {
     password,
   });
 
-  const { data } = await supabase.from('users').select("role").eq('email', email).single();
-
   if (error) {
-    return encodedRedirect("error", "/sign-in", error.message);
+    return encodedRedirect("error", "/login", "Email or password is incorrect!");
   }
+
+  const { data } = await supabase.from('users').select("role").eq('email', email).single();
 
   if (data?.role == "admin") {
     return redirect("/admin");
