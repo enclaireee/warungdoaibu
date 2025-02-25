@@ -23,7 +23,7 @@ export const signUpAction = async (formData: FormData) => {
   if (!email || !password) {
     return encodedRedirect(
       "error",
-      "/sign-up",
+      "/register",
       "Email and password are required",
     );
   }
@@ -38,7 +38,7 @@ export const signUpAction = async (formData: FormData) => {
 
   if (error) {
     console.error(error.code + " " + error.message);
-    return encodedRedirect("error", "/sign-up", error.message);
+    return encodedRedirect("error", "/register", error.message);
   } else {
     const userId = authData?.user?.id;
     const { error: insertError } = await supabase.from("users").insert([
@@ -52,7 +52,7 @@ export const signUpAction = async (formData: FormData) => {
 
     if (insertError) {
       console.error("Insert Error:", insertError.message);
-      return encodedRedirect("error", "/sign-up", insertError.message);
+      return encodedRedirect("error", "/register", insertError.message);
     }
 
     return encodedRedirect(

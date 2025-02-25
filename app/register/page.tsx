@@ -15,6 +15,7 @@ const page = () => {
     const [role, setRole] = useState(0);
     const searchParams = useSearchParams();
     const success = searchParams.get("success");
+    const error = searchParams.get("error");
 
   return (
     <div className="bg-cover bg-[black] min-h-full w-full justify-items-center">
@@ -83,6 +84,14 @@ const page = () => {
                 
                 {success && <h1 className="relative text-[1.5vw] text-center text-[white]">
                     {success}
+                </h1>}
+
+                {error == `duplicate key value violates unique constraint "users_email_key"` && <h1 className="relative text-[1.5vw] text-center text-[white]">
+                    Email is already used!
+                </h1>}
+
+                {error && error != `duplicate key value violates unique constraint "users_email_key"`  && <h1 className="relative text-[1.5vw] text-center text-[white]">
+                    {error}
                 </h1>}
 
                 <div className="relative left-1/2 transform -translate-x-1/2 justify-items-center mt-[1vw] w-[10vw] h-[5vw] bg-transparent">
