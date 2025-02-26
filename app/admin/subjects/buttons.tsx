@@ -6,9 +6,9 @@ const buttons = () => {
   return (
     <>
         <button
-            onClick={() => {redirect("/admin/quizzes/new")}}
+            onClick={() => {redirect("/admin/subjects/new")}}
             className="relative left-1/2 transform -translate-x-1/2  text-[white] text-[2vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[8vw] mt-[6vw] w-[15vw]">
-                Create Quiz
+                Create Subject
         </button>
         <button
             onClick={() => {redirect("/admin")}}

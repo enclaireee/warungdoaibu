@@ -72,7 +72,7 @@ export default function Page() {
     
     useEffect(() => {
         const getData = async () => {
-            const { data: quizData } = await supabase.from("quizzes").select("*").eq("id", params.id).single();
+            const { data: quizData } = await supabase.from("quizzes").select("*").eq("id", params.name).single();
             setQuiz_Data(quizData);
         };
 

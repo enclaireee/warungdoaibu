@@ -88,6 +88,41 @@ export const signInAction = async (formData: FormData) => {
   }
 };
 
+export const addSubject = async (formData: FormData) => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const subjectName = formData.get("name")?.toString();
+  const {data: nama} = await supabase.from("subjects").select("*").eq("name", subjectName).single();
+  console.log(nama);
+  if (nama){
+    return encodedRedirect(
+      "error",
+      "/admin/subjects/new",
+      "Subject Name already used"
+    );
+  }
+
+  const { data, error } = await supabase.from("subjects").insert([
+    {
+      name: subjectName,
+      admin_id: user?.id
+    }
+  ]).select("id").single();
+
+  if (error){
+    return encodedRedirect(
+      "error",
+      "/admin/subjects/new",
+      `${error}`,
+    );
+  }else{
+    return redirect("/admin/subjects");
+  }
+}
+
 export const addQuiz = async (formData: FormData) => {
   type OptionType = {
     question: string;
@@ -101,12 +136,17 @@ export const addQuiz = async (formData: FormData) => {
   const opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
   const title = formData.get("title")?.toString();
   const description = formData.get("description")?.toString();
+  const subject_id = formData.get("subject_id")?.toString();
+  console.log(subject_id);
+
+  const {data: subjectData} = await supabase.from("subjects").select("*").eq("id", subject_id).single();
 
   const { data: quizData, error: insertError } = await supabase.from("quizzes").insert([
     {
       title: title,
       description: description,
-      admin_id: user?.id
+      admin_id: user?.id,
+      subject_id: subject_id,
     }
   ]).select("id").single();
 
@@ -149,7 +189,7 @@ export const addQuiz = async (formData: FormData) => {
     }
   }
 
-  return redirect("/admin/quizzes");
+  return redirect(`/admin/subjects/${subjectData.name}/quizzes`);
 }
 
 export const editQuiz = async (formData: FormData) => {
@@ -171,6 +211,11 @@ export const editQuiz = async (formData: FormData) => {
   const quizId = formData.get("quizId")?.toString();
   let questionSebelumnya: OptionType[] = [];
   console.log(JSON.stringify(opsi, null, 2));
+  const subject_id = formData.get("subject_id")?.toString();
+  console.log(`subject_id = ${subject_id}`);
+  console.log(`quiz_id = ${quizId}`);
+
+  const {data: subjectData} = await supabase.from("subjects").select("*").eq("id", subject_id).single();
 
   if (!quizId || !user?.id) {
     console.error("Missing quiz ID or user ID");
@@ -192,28 +237,28 @@ export const editQuiz = async (formData: FormData) => {
     console.log("Quiz updated successfully:", updatedQuiz);
   }
 
-  const {data: quesSebelum} = await supabase.from("questions").select("*").eq("quiz_id", quizId);
-  if (quesSebelum){
+  const { data: quesSebelum } = await supabase.from("questions").select("*").eq("quiz_id", quizId);
+  if (quesSebelum) {
     questionSebelumnya = quesSebelum;
     console.log(`sebelumnya: ${JSON.stringify(questionSebelumnya, null, 2)}`);
   }
 
-  for (let x = 0; x < questionSebelumnya.length; x++){
+  for (let x = 0; x < questionSebelumnya.length; x++) {
     console.log(`quesId: ${questionSebelumnya[x].id}`)
     const { data, error: deleteError } = await supabase
-    .from("questions")
-    .delete()
-    .eq("id", questionSebelumnya[x].id); 
+      .from("questions")
+      .delete()
+      .eq("id", questionSebelumnya[x].id);
 
-    if (data){
+    if (data) {
       console.log(`deleted data: ${data}`);
     }
 
-    if (deleteError){
+    if (deleteError) {
       console.log(`error delete: ${JSON.stringify(deleteError, null, 2)}`);
     }
   }
-  
+
   for (let ops of opsi) {
     const { data: questionData, error: erro } = await supabase
       .from("questions")
@@ -251,7 +296,7 @@ export const editQuiz = async (formData: FormData) => {
     }
   }
 
-  return redirect("/admin/quizzes");
+  return redirect(`/admin/subjects/${subjectData.name}/quizzes`);
 }
 
 export const forgotPasswordAction = async (formData: FormData) => {
