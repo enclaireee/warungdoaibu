@@ -228,7 +228,7 @@ export default function Page() {
                         <textarea
                             value={choice}
                             placeholder={`Option ${j + 1}`}
-                            className="ml-[1vw] placeholder:text-sm rounded-[1vw] p-[0.2vw] placeholder:text-muted-foreground scroll-container focus:outline-none resize-none w-[16.7vw]"
+                            className="ml-[1vw] placeholder:text-sm rounded-[1vw] p-[0.2vw] py-[1vw] placeholder:text-muted-foreground scroll-container focus:outline-none resize-none h-[4vw] w-[16.7vw]"
                             onChange={(e) => {
                                 const newOpsi = [...opsi];
                                 newOpsi[i].opsi[j] = e.target.value;
