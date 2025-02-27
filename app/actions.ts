@@ -95,9 +95,9 @@ export const addSubject = async (formData: FormData) => {
   } = await supabase.auth.getUser();
 
   const subjectName = formData.get("name")?.toString();
-  const {data: nama} = await supabase.from("subjects").select("*").eq("name", subjectName).single();
+  const { data: nama } = await supabase.from("subjects").select("*").eq("name", subjectName).single();
   console.log(nama);
-  if (nama){
+  if (nama) {
     return encodedRedirect(
       "error",
       "/admin/subjects/new",
@@ -112,13 +112,13 @@ export const addSubject = async (formData: FormData) => {
     }
   ]).select("id").single();
 
-  if (error){
+  if (error) {
     return encodedRedirect(
       "error",
       "/admin/subjects/new",
       `${error}`,
     );
-  }else{
+  } else {
     return redirect("/admin/subjects");
   }
 }
@@ -139,7 +139,7 @@ export const addQuiz = async (formData: FormData) => {
   const subject_id = formData.get("subject_id")?.toString();
   console.log(subject_id);
 
-  const {data: subjectData} = await supabase.from("subjects").select("*").eq("id", subject_id).single();
+  const { data: subjectData } = await supabase.from("subjects").select("*").eq("id", subject_id).single();
 
   const { data: quizData, error: insertError } = await supabase.from("quizzes").insert([
     {
@@ -215,7 +215,7 @@ export const editQuiz = async (formData: FormData) => {
   console.log(`subject_id = ${subject_id}`);
   console.log(`quiz_id = ${quizId}`);
 
-  const {data: subjectData} = await supabase.from("subjects").select("*").eq("id", subject_id).single();
+  const { data: subjectData } = await supabase.from("subjects").select("*").eq("id", subject_id).single();
 
   if (!quizId || !user?.id) {
     console.error("Missing quiz ID or user ID");
@@ -297,6 +297,97 @@ export const editQuiz = async (formData: FormData) => {
   }
 
   return redirect(`/admin/subjects/${subjectData.name}/quizzes`);
+}
+
+export const submitAnswer = async (formData: FormData) => {
+  type OptionType = {
+    id: string,
+    question_text: string,
+    opsi: string[],
+    option: boolean[],
+  };
+
+  type AnswerType = {
+    id: string,
+    question_id: string,
+    choice_text: string,
+    is_correct: boolean,
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let score = 0;
+  let right_answers = 0;
+  let wrong_answers = 0;
+  const opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
+  const title = formData.get("title")?.toString();
+  const description = formData.get("description")?.toString();
+  const quizId = formData.get("quizId")?.toString();
+  let questionSebelumnya: OptionType[] = [];
+  console.log(JSON.stringify(opsi, null, 2));
+  const subject_id = formData.get("subject_id")?.toString();
+  console.log(`subject_id = ${subject_id}`);
+  console.log(`quiz_id = ${quizId}`);
+  console.log(`jawaban: ` + JSON.stringify(opsi, null, 2));
+
+  if (!quizId || !user?.id) {
+    console.error("Missing quiz ID or user ID");
+    return;
+  }
+
+  const { data: quesSebelum } = await supabase.from("questions").select("*").eq("quiz_id", quizId);
+  if (quesSebelum) {
+    questionSebelumnya = quesSebelum;
+    console.log(`sebelumnya: ${JSON.stringify(questionSebelumnya, null, 2)}`);
+  }
+  
+  for (let x = 0; x < questionSebelumnya.length; x++){
+    let bisa: boolean = true;
+    let map: Record<string, boolean> = {};
+    let dataAnswer: AnswerType[];
+    const {data, error} = await supabase.from("answer_choices").select("*").eq("question_id", questionSebelumnya[x].id);
+    if (data){
+      dataAnswer = data;
+      for (let y = 0; y < 4; y++){
+        map[dataAnswer[y].choice_text] = dataAnswer[y].is_correct;
+      }
+
+      for (let y = 0; y < 4; y++){
+        if (opsi[x].option[y] == true){
+          if (map[opsi[x].opsi[y]] == true){
+            right_answers++;
+          }else{
+            wrong_answers++;
+          }
+
+          break;
+        }
+      }
+    }else{
+      console.log(error)
+    }
+  }
+
+  score = Math.round(100*(right_answers / questionSebelumnya.length));
+  console.log(`benar: ${right_answers}\nsalah: ${wrong_answers}\nscore: ${score}`);
+
+  const {error} = await supabase.from("quiz_results").insert([{
+    quiz_id: quizId,
+    student_id: user.id,
+    score: score,
+    completed_at: new Date().toISOString(),
+    right_answers: right_answers,
+    wrong_answers: wrong_answers,
+  }])
+
+  if (error){
+    console.log(error);
+  }
+
+  return redirect(`/student`);
 }
 
 export const forgotPasswordAction = async (formData: FormData) => {

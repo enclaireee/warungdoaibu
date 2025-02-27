@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import React from "react";
 import { useParams } from "next/navigation";
-import { editQuiz } from "@/app/actions";
+import { submitAnswer } from "@/app/actions";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
@@ -181,7 +181,7 @@ export default function Page() {
                     Question {i + 1}
                 </Label>
                 <div
-                    className="ml-[1vw] mt-[1vw] placeholder:text-sm rounded-[1vw] p-[0.2vw] placeholder:text-muted-foreground scroll-container focus:outline-none resize-none w-[16.7vw]">
+                    className="ml-[1vw] mt-[1vw] placeholder:text-sm rounded-[1vw] p-[0.2vw] placeholder:text-muted-foreground scroll-container focus:outline-none resize-none w-[50vw]">
                     {q.question_text}
                 </div>
 
@@ -230,7 +230,7 @@ export default function Page() {
                     <div className="relative left-1/2 transform -translate-x-1/2 justify-items-center bg-transparent mt-[10vw] h-[10vw] w-[23vw]">
                         <SubmitButton
                             className="relative left-1/2 transform -translate-x-1/2 h-[8vw] w-[15vw] rounded-[2vw] text-[1.5vw] font-bold"
-                            formAction={editQuiz}
+                            formAction={submitAnswer}
                             pendingText="Updating quiz..."
                         >
                             Submit Answers!
