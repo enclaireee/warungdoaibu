@@ -17,11 +17,6 @@ export default function Page() {
         is_correct: boolean;
     };
 
-    type OptionOpsiType = {
-        choice_text: string;
-        is_correct: boolean;
-    };
-
     type OpsiType = {
         question_id: string;
         question_text: string;
@@ -49,11 +44,9 @@ export default function Page() {
     const [banyakQuestion, setBanyakQuestion] = useState(0);
     const [opsi, setOpsi] = useState<OpsiType[]>([]);
     const [questionss, setQuestions] = useState<QuestionsType[]>([]);
-    const [opsi_option, setOO] = useState<OptionOpsiType[]>([]);
     const [ans, setAns] = useState<answer_choicesType[]>([]);
     const [udhDitekan, setUdhDitekan] = useState<number[]>([]);
 
-    
     useEffect(() => {
         async function fetchUser() {
             const { data: { user }, error: err } = await supabase.auth.getUser();
@@ -62,14 +55,18 @@ export default function Page() {
                 redirect("/login");
             } else {
                 setUser(user);
-                console.log(user);
+                const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
+                if (userData) {
+                    if (userData.role == "student") {
+                        redirect("/login");
+                    }
+                }
             }
         }
 
         fetchUser();
     }, []);
 
-    
     useEffect(() => {
         const getData = async () => {
             const { data: quizData } = await supabase.from("quizzes").select("*").eq("id", params.name).single();
@@ -79,22 +76,22 @@ export default function Page() {
         getData();
     }, [user]);
 
-    
+
     useEffect(() => {
         const getData = async () => {
-            if (!quiz_data?.id) return; 
+            if (!quiz_data?.id) return;
 
             const { data: questionsData, error } = await supabase.from("questions").select("id, question_text").eq("quiz_id", quiz_data.id);
-            console.log("Raw Questions Data:", questionsData); 
+            console.log("Raw Questions Data:", questionsData);
 
             const quesData: QuestionsType[] = questionsData ?? [];
-            setQuestions(quesData); 
+            setQuestions(quesData);
         };
 
         getData();
     }, [quiz_data]);
 
-     
+
     useEffect(() => {
         const e: OpsiType[] = [];
         const udh: number[] = [];
@@ -139,19 +136,18 @@ export default function Page() {
         setOpsi(e);
     }, [ans]);
 
-    
     const IsiOpsi = (indeks1: number, indeks2: number) => {
         setOpsi((prev) => {
             const newOpsi = [...prev];
             newOpsi[indeks1].option = newOpsi[indeks1].option.map((_, index) =>
-                index === indeks2 ? 1 : 0 
+                index === indeks2 ? 1 : 0
             );
             return newOpsi;
         });
     };
 
     const AddQuestion = () => {
-        const newQuestionId = `new-question-${Date.now()}`; 
+        const newQuestionId = `new-question-${Date.now()}`;
         setUdhDitekan((prev) => [...prev, 0]);
         setOpsi((prevOpsi) => [
             ...prevOpsi,
@@ -229,7 +225,7 @@ export default function Page() {
                             Back
                         </button>
                         <h1 className="relative text-[4vw] top-0 mt-[0.5vw] text-[white] font-bold">
-                           Edit {quiz_data?.title}
+                            Edit {quiz_data?.title}
                         </h1>
                     </div>
                 </div>

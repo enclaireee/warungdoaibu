@@ -22,11 +22,6 @@ export default function Page() {
         is_correct: boolean;
     };
 
-    type OptionOpsiType = {
-        choice_text: string;
-        is_correct: boolean;
-    };
-
     type OpsiType = {
         question_id: string;
         question_text: string;
@@ -50,15 +45,12 @@ export default function Page() {
 
     const [user, setUser] = useState<any | null>(null);
     const [quiz_data, setQuiz_Data] = useState<QuizType>();
-    const [loading, setLoading] = useState(true);
     const [subject, setSubject] = useState<SubjectType>();
     const [banyakQuestion, setBanyakQuestion] = useState(0);
     const [opsi, setOpsi] = useState<OpsiType[]>([]);
     const [questionss, setQuestions] = useState<QuestionsType[]>([]);
-    const [opsi_option, setOO] = useState<OptionOpsiType[]>([]);
     const [ans, setAns] = useState<answer_choicesType[]>([]);
     const [udhDitekan, setUdhDitekan] = useState<number[]>([]);
-
 
     useEffect(() => {
         async function fetchUser() {
@@ -68,7 +60,12 @@ export default function Page() {
                 redirect("/login");
             } else {
                 setUser(user);
-                console.log(user);
+                const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
+                if (userData) {
+                    if (userData.role == "student") {
+                        redirect("/login");
+                    }
+                }
             }
         }
 

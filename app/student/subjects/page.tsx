@@ -31,7 +31,12 @@ const page = () => {
         redirect("/login");
       } else {
         setUser(user);
-        console.log(user);
+        const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
+        if (userData) {
+          if (userData.role == "admin") {
+            redirect("/login");
+          }
+        }
       }
     }
 

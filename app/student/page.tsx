@@ -16,6 +16,10 @@ const page = async () => {
 
   const { data: userData } = await supabase.from("users").select("*").eq("email", user.email).single();
 
+  if (userData.role == "admin") {
+    return redirect("/login");
+  }
+
   return (
     <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
       <div className="relative bg-transparent top-[4vw] h-[40vw] w-[60vw] mt-[2vw]">
@@ -36,7 +40,7 @@ const page = async () => {
             Role: {userData.role}
           </h1>
         </div>
-        <Buttons/>
+        <Buttons />
       </div>
     </div>
   )

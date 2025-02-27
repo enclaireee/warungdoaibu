@@ -39,7 +39,12 @@ const page = () => {
         redirect("/login");
       } else {
         setUser(user);
-        console.log(user);
+        const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
+        if (userData) {
+          if (userData.role == "student") {
+            redirect("/login");
+          }
+        }
       }
     }
 
@@ -70,7 +75,7 @@ const page = () => {
       if (!user) return;
 
       const { data: dataQ } = await supabase.from("quizzes").select("*").eq("subject_id", subject?.id);
-      if (dataQ){
+      if (dataQ) {
         setDataQuiz(dataQ ?? []);
       }
     }

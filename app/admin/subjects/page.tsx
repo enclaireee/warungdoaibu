@@ -1,7 +1,7 @@
 "use client"
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
-import React from 'react';
+import React, { use } from 'react';
 import { useParams } from 'next/navigation';
 import { addQuiz, signUpAction } from "@/app/actions";
 import { Input } from "@/components/ui/input";
@@ -31,17 +31,22 @@ const page = () => {
         redirect("/login");
       } else {
         setUser(user);
-        console.log(user);
+        const {data: userData} = await supabase.from("users").select("*").eq("email", user?.email).single();
+        if (userData) {
+          if (userData.role == "student"){
+            redirect("/login");
+          }
+        }
       }
     }
 
     fetchUser();
   }, []);
-
+  
   useEffect(() => {
     async function getDataQuiz() {
       if (!user) return;
-
+      
       const { data: dataQ } = await supabase.from("subjects").select("*").eq("admin_id", user.id);
       setDataSubject(dataQ ?? []);
     }
@@ -50,19 +55,19 @@ const page = () => {
   }, [user]);
 
   const redirectToSubject = async (id: string) => {
-    const {data} = await supabase.from("subjects").select("name").eq("id", id).single();
-    if (data){
+    const { data } = await supabase.from("subjects").select("name").eq("id", id).single();
+    if (data) {
       redirect(`/admin/subjects/${data.name}/quizzes`);
-    }else{
+    } else {
       alert("tidak bisa");
     }
   }
 
   const deleteSubject = async (id: string) => {
-    const {error} = await supabase.from("subjects").delete().eq("id", id);
-    if (error){
+    const { error } = await supabase.from("subjects").delete().eq("id", id);
+    if (error) {
       alert(JSON.stringify(error, null, 2));
-    }else{
+    } else {
       const { data: dataQ } = await supabase.from("subjects").select("*").eq("admin_id", user.id);
       setDataSubject(dataQ ?? []);
     }

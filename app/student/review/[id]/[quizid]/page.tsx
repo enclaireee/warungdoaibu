@@ -48,6 +48,8 @@ export default function Page() {
     const supabase = createClient();
     const params = useParams();
 
+    const [jawabanBenar, setJawabanBenar] = useState<number[]>([]);
+    const abcd = ['A.', 'B.', 'C.', 'D.'];
     const [user, setUser] = useState<any | null>(null);
     const [quiz_data, setQuiz_Data] = useState<QuizType>();
     const [loading, setLoading] = useState(true);
@@ -101,7 +103,7 @@ export default function Page() {
 
     useEffect(() => {
         const getData = async () => {
-            const { data: quizData } = await supabase.from("quizzes").select("*").eq("id", params.quiz_id).single();
+            const { data: quizData } = await supabase.from("quizzes").select("*").eq("id", params.quizid).single();
             setQuiz_Data(quizData);
         };
 
@@ -156,15 +158,22 @@ export default function Page() {
     useEffect(() => {
         const e: OpsiType[] = opsi;
         let k = 0;
+        let idx: number[] = [];
         for (let x = 0; x < ans.length; x++) {
             if (x % 4 == 0 && x > 0) {
                 k++;
             }
 
+            if (e[k].option[x % 4] == 1){
+                idx.push(x % 4);
+            }
+
+            setJawabanBenar(idx);
             e[k].opsi[x % 4] = ans[x].choice_text;
             e[k].option[x % 4] = Number(ans[x].is_correct);
         }
 
+        setJawabanBenar(idx);
         setOpsi(e);
     }, [ans]);
 
@@ -193,18 +202,17 @@ export default function Page() {
                 <div className="relative bg-transparent h-auto w-[50vw] ml-[-1vw] flex flex-wrap">
                     {q.opsi.map((choice, j) => (
                         <div key={`${q.question_id}-option-${j}`} className="relative pl-[-1vw] flex flex-wrap">
-                            <input
-                                type="radio"
-                                className="relative top-[1.05vw] ml-[3vw] h-[2vw] w-[2vw]"
-                                name={`question-${q.question_id}`}
-                                onChange={() => IsiOpsi(i, j)}
-                            />
                             <div
                                 className="relative mt-[0.8vw] ml-[1vw] placeholder:text-sm rounded-[1vw] p-[0.2vw] placeholder:text-muted-foreground scroll-container focus:outline-none resize-none w-[16.7vw]">
-                                {choice}
+                                {abcd[j]} &nbsp;&nbsp; {choice}
                             </div>
                         </div>
                     ))}
+                </div>
+                <div className="relative bg-transparent mt-[2vw] h-auto w-[30vw] ml-[-1vw] flex flex-wrap">
+                    <h1 className="relative pl-[1vw] text-[1.2vw] top-0 mt-[0.5vw] text-[white]">
+                        Jawaban Benar:&nbsp;&nbsp; {abcd[jawabanBenar[i]]} &nbsp;&nbsp; {opsi[i].opsi[jawabanBenar[i]]}
+                    </h1>
                 </div>
             </div>
         </div>
@@ -213,7 +221,7 @@ export default function Page() {
     return (
         <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
             <button
-                onClick={() => redirect(`/student/subjects/${subject?.id}`)}
+                onClick={() => redirect(`/student/review/${subject?.id}/`)}
                 className="absolute font-light text-[white] left-[5vw] top-[3vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]"
             >
                 Back
@@ -227,22 +235,8 @@ export default function Page() {
                     </div>
                 </div>
                 <div className="relative mt-[-5vw]">{questions}</div>
-                <form>
-                    <Input type="hidden" name="opsi" defaultValue={JSON.stringify(opsi)} required />
-                    <Input type="hidden" name="quizId" defaultValue={params.quiz_id} required />
-                    <Input type="hidden" name="subject_id" defaultValue={subject?.id} required />
-
-                    <div className="relative left-1/2 transform -translate-x-1/2 justify-items-center bg-transparent mt-[10vw] h-[10vw] w-[23vw]">
-                        <SubmitButton
-                            className="relative left-1/2 transform -translate-x-1/2 h-[8vw] w-[15vw] rounded-[2vw] text-[1.5vw] font-bold"
-                            formAction={submitAnswer}
-                            pendingText="Submitting answers..."
-                        >
-                            Submit Answers!
-                        </SubmitButton>
-                    </div>
-                </form>
             </div>
+            <div className="relative h-[5vw] w-full"></div>
         </div>
     );
 }
