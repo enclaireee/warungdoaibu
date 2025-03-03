@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { editQuiz } from "@/app/actions";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
 
 export default function Page() {
+    const searchParams = useSearchParams();
     interface SubjectType {
         id: string,
         name: string
@@ -51,6 +52,7 @@ export default function Page() {
     const [questionss, setQuestions] = useState<QuestionsType[]>([]);
     const [ans, setAns] = useState<answer_choicesType[]>([]);
     const [udhDitekan, setUdhDitekan] = useState<number[]>([]);
+    const error = searchParams.get("error");
 
     useEffect(() => {
         async function fetchUser() {
@@ -254,6 +256,9 @@ export default function Page() {
                         </h1>
                     </div>
                 </div>
+                {error && <h2 className="relative text-[1vw] text-[white] font-light">
+                    Questions must have an answer!
+                </h2>}
                 <form>
                     <div className="relative flex flex-col bg-transparent min-h-auto w-[60vw] mt-[2vw]">
                         <Label htmlFor="title" className="text-[1.5vw]">

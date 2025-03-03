@@ -141,6 +141,24 @@ export const addQuiz = async (formData: FormData) => {
 
   const { data: subjectData } = await supabase.from("subjects").select("*").eq("id", subject_id).single();
 
+  let bisa = 0;
+  
+  for (let x of opsi){
+    for (let y of x.option){
+      if (y == true){
+        bisa++;
+      }
+    }
+  }
+
+  if (bisa != opsi.length){
+    return encodedRedirect(
+      "error",
+      `/admin/subjects/${subjectData?.name}/quizzes/new`,
+      "Questions must have an answer!",
+    );
+  }
+
   const { data: quizData, error: insertError } = await supabase.from("quizzes").insert([
     {
       title: title,
@@ -205,7 +223,7 @@ export const editQuiz = async (formData: FormData) => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
+  let opsi: OptionType[] = JSON.parse(formData.get("opsi") as string);
   const title = formData.get("title")?.toString();
   const description = formData.get("description")?.toString();
   const quizId = formData.get("quizId")?.toString();
@@ -214,8 +232,33 @@ export const editQuiz = async (formData: FormData) => {
   const subject_id = formData.get("subject_id")?.toString();
   console.log(`subject_id = ${subject_id}`);
   console.log(`quiz_id = ${quizId}`);
-
+  let bisa = 0;
+  
   const { data: subjectData } = await supabase.from("subjects").select("*").eq("id", subject_id).single();
+  
+  for (let x of opsi){
+    for (let y of x.option){
+      if (y == true){
+        bisa++;
+      }
+    }
+  }
+
+  for (let x = 0; x < opsi.length; x++){
+    for (let y = 0; y < 4; y++){
+      if (opsi[x].opsi[y] == ''){
+        opsi[x].opsi[y] = 'x';
+      }
+    }
+  }
+
+  if (bisa != opsi.length){
+    return encodedRedirect(
+      "error",
+      `/admin/subjects/${subjectData?.name}/quizzes/${quizId}`,
+      "Questions must have an answer!",
+    );
+  }
 
   if (!quizId || !user?.id) {
     console.error("Missing quiz ID or user ID");
@@ -260,6 +303,10 @@ export const editQuiz = async (formData: FormData) => {
   }
 
   for (let ops of opsi) {
+    if (ops.question_text == ''){
+      continue;
+    }
+    
     const { data: questionData, error: erro } = await supabase
       .from("questions")
       .insert([{ quiz_id: quizId, question_text: ops.question_text }])

@@ -7,10 +7,11 @@ import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
 import { redirect } from 'next/navigation';
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 const page = () => {
     const params = useParams();
+    const searchParams = useSearchParams();
     interface SubjectType {
         id: string,
         name: string
@@ -28,6 +29,7 @@ const page = () => {
     const [user, setUser] = useState<any | null>(null);
     const [subject, setSubject] = useState<SubjectType>();
     const supabase = createClient();
+    const error = searchParams.get("error");
 
     useEffect(() => {
         async function fetchUser() {
@@ -191,6 +193,9 @@ const page = () => {
                         </h1>
                     </div>
                 </div>
+                {error && <h2 className="relative text-[1vw] text-[white] font-light">
+                    Questions must have an answer!
+                </h2>}
                 <form>
                     <div className="relative flex flex-col bg-transparent min-h-auto w-[60vw] mt-[2vw]">
                         <Label htmlFor="title" className="text-[1.5vw]">Title</Label>
