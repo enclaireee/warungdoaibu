@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useSearchParams } from "next/navigation";
 
 const page = () => {
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+  const router = useRouter();
 
   return (
     <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
@@ -18,7 +19,7 @@ const page = () => {
         <div className="relative bg-transparent h-[6vw] w-full top-0">
           <div className="relative justify-items-center bg-transparent h-[7vw] w-full">
             <button
-              onClick={() => { redirect("/admin/subjects") }}
+              onClick={() => { router.push("/admin/subjects") }}
               className="absolute font-light text-[white] left-[3vw] top-[1.5vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]">
               Back
             </button>

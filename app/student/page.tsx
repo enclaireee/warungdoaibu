@@ -2,6 +2,7 @@ import React from 'react'
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import Buttons from './buttons';
+import Buttons1 from './buttonslogout';
 
 const page = async () => {
   const supabase = await createClient();
@@ -22,6 +23,7 @@ const page = async () => {
 
   return (
     <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
+      <Buttons1 />
       <div className="relative bg-transparent top-[4vw] h-[40vw] w-[60vw] mt-[2vw]">
         <div className="relative justify-items-center bg-transparent h-[6vw] w-full top-0">
           <h1 className="relative text-[2vw] top-0 mt-[0.5vw] text-[white] font-bold">

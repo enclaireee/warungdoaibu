@@ -1,6 +1,6 @@
 "use client";
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React from "react";
 import { useParams } from "next/navigation";
 import { submitAnswer } from "@/app/actions";
@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
 
 export default function Page() {
+    const router = useRouter();
     interface SubjectType {
         id: string,
         name: string
@@ -65,13 +66,13 @@ export default function Page() {
             const { data: { user }, error: err } = await supabase.auth.getUser();
             if (!user) {
                 console.log(err);
-                redirect("/login");
+                router.push("/login");
             } else {
                 setUser(user);
                 const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
                 if (userData) {
                     if (userData.role == "admin") {
-                        redirect("/login");
+                        router.push("/login");
                     }
                 }
             }
@@ -213,7 +214,7 @@ export default function Page() {
     return (
         <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
             <button
-                onClick={() => redirect(`/student/subjects/${subject?.id}`)}
+                onClick={() => router.push(`/student/subjects/${subject?.id}`)}
                 className="absolute font-light text-[white] left-[5vw] top-[3vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]"
             >
                 Back

@@ -1,6 +1,6 @@
 "use client"
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { use } from 'react';
 import { useParams } from 'next/navigation';
 import { addQuiz, signUpAction } from "@/app/actions";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import Buttons from './buttons'
 
 const page = () => {
+  const router = useRouter();
   interface Subject {
     id: string;
     admin_id: string;
@@ -28,13 +29,13 @@ const page = () => {
       const { data: { user }, error: err } = await supabase.auth.getUser();
       if (!user) {
         console.log(err);
-        redirect("/login");
+        router.push("/login");
       } else {
         setUser(user);
         const {data: userData} = await supabase.from("users").select("*").eq("email", user?.email).single();
         if (userData) {
           if (userData.role == "student"){
-            redirect("/login");
+            router.push("/login");
           }
         }
       }
@@ -57,7 +58,7 @@ const page = () => {
   const redirectToSubject = async (id: string) => {
     const { data } = await supabase.from("subjects").select("name").eq("id", id).single();
     if (data) {
-      redirect(`/admin/subjects/${data.name}/quizzes`);
+      router.push(`/admin/subjects/${data.name}/quizzes`);
     } else {
       alert("tidak bisa");
     }

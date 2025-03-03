@@ -1,6 +1,6 @@
 "use client"
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React from 'react';
 import { useParams } from 'next/navigation';
 import { addQuiz, signUpAction } from "@/app/actions";
@@ -12,6 +12,7 @@ import { data } from "autoprefixer";
 
 const page = () => {
   const params = useParams();
+  const router = useRouter();
   interface SubjectType {
     id: string,
     name: string
@@ -36,13 +37,13 @@ const page = () => {
       const { data: { user }, error: err } = await supabase.auth.getUser();
       if (!user) {
         console.log(err);
-        redirect("/login");
+        router.push("/login");
       } else {
         setUser(user);
         const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
         if (userData) {
           if (userData.role == "admin") {
-            redirect("/login");
+            router.push("/login");
           }
         }
       }
@@ -87,7 +88,7 @@ const page = () => {
       <div key={i} className="justify-items-center">
         <div className="relative bg-transparent min-h-auto max-h-[9.5vw] w-[35vw]">
           <button
-            onClick={() => redirect(`/student/subjects/${subject?.id}/${dataa[i].id}`)}
+            onClick={() => router.push(`/student/subjects/${subject?.id}/${dataa[i].id}`)}
             className="relative left-1/2 transform -translate-x-1/2 flex flex-col mt-[1vw] rounded-[2vw] mih-h-auto max-h-[9.5vw] w-[35vw] bg-[grey] opacity-[90%] hover:opacity-[100%]">
             <h1 className="relative m-[0.5vw] text-[white] font-bold text-[2vw]">
               {dataa[i].title}
@@ -105,7 +106,7 @@ const page = () => {
   return (
     <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
       <button
-        onClick={() => redirect(`/student/subjects/`)}
+        onClick={() => router.push(`/student/subjects/`)}
         className="absolute font-light text-[white] left-[5vw] top-[3vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]"
       >
         Back

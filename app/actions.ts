@@ -171,6 +171,10 @@ export const addQuiz = async (formData: FormData) => {
   const quizId = quizData?.id;
 
   for (let ops of opsi) {
+    if (ops.question == ''){
+      continue;
+    }
+    
     const { data: questionData, error: erro } = await supabase
       .from("questions")
       .insert([{ quiz_id: quizId, question_text: ops.question }])
@@ -306,7 +310,7 @@ export const editQuiz = async (formData: FormData) => {
     if (ops.question_text == ''){
       continue;
     }
-    
+
     const { data: questionData, error: erro } = await supabase
       .from("questions")
       .insert([{ quiz_id: quizId, question_text: ops.question_text }])

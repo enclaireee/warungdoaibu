@@ -1,6 +1,6 @@
 "use client";
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React from "react";
 import { useParams } from "next/navigation";
 import { editQuiz } from "@/app/actions";
@@ -10,6 +10,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
 
 export default function Page() {
+    const router = useRouter();
     type answer_choicesType = {
         id: string;
         question_id: string;
@@ -52,13 +53,13 @@ export default function Page() {
             const { data: { user }, error: err } = await supabase.auth.getUser();
             if (!user) {
                 console.log(err);
-                redirect("/login");
+                router.push("/login");
             } else {
                 setUser(user);
                 const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
                 if (userData) {
                     if (userData.role == "student") {
-                        redirect("/login");
+                        router.push("/login");
                     }
                 }
             }
@@ -219,7 +220,7 @@ export default function Page() {
                 <div className="relative bg-transparent h-[6vw] w-full top-0">
                     <div className="relative justify-items-center bg-transparent h-[7vw] w-full">
                         <button
-                            onClick={() => redirect("/admin/quizzes")}
+                            onClick={() => router.push("/admin/quizzes")}
                             className="absolute font-light text-[white] left-[5vw] top-[1.5vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]"
                         >
                             Back

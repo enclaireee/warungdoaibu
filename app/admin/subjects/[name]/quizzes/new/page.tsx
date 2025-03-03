@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useParams, useSearchParams } from "next/navigation";
 
 const page = () => {
     const params = useParams();
+    const router = useRouter();
     const searchParams = useSearchParams();
     interface SubjectType {
         id: string,
@@ -36,7 +37,7 @@ const page = () => {
             const { data: { user }, error: err } = await supabase.auth.getUser();
             if (!user) {
                 console.log(err);
-                redirect("/login");
+                router.push("/login");
             } else {
                 setUser(user);
                 console.log(user);
@@ -184,7 +185,7 @@ const page = () => {
                 <div className="relative bg-transparent h-[6vw] w-full top-0">
                     <div className="relative justify-items-center bg-transparent h-[7vw] w-full">
                         <button
-                            onClick={() => { redirect("/admin/quizzes") }}
+                            onClick={() => { router.push(`/admin/subjects/${subject?.name}/quizzes`) }}
                             className="absolute font-light text-[white] left-[5vw] top-[1.5vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]">
                             Back
                         </button>
