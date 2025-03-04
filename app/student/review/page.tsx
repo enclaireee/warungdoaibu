@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
+import IconMail from '@/components/icons/mail';
 
 const page = () => {
   interface Subject {
@@ -64,13 +65,16 @@ const page = () => {
         <div className="relative bg-transparent min-h-auto max-h-[9.5vw] w-[35vw]">
           <button
             onClick={() => redirect(`/student/review/${dataa[i].subjectid}/`)}
-            className="relative ml-[1vw]flex flex-col mt-[1vw] rounded-[2vw] mih-h-auto max-h-[9.5vw] w-[35vw] bg-[grey] opacity-[90%] hover:opacity-[100%]">
-            <h1 className="relative m-[0.5vw] text-[white] font-bold text-[2vw]">
-              {dataa[i].subjectname}
-            </h1>
-            <h1 className="relative m-[0.5vw] text-[white] font-light text-[1vw]">
-              Creator: {dataa[i].adminname}
-            </h1>
+            className="relative ml-[1vw] flex items-center mt-[1vw] rounded-[2vw] mih-h-auto max-h-[9.5vw] w-[35vw] bg-[grey] opacity-[90%] hover:opacity-[100%]">
+            <IconMail className="w-[4vw] h-[4vw] ml-[1vw]" />
+            <div className="flex flex-col ml-[1vw]">
+              <h1 className="relative m-[0.5vw] text-[white] font-bold text-[2vw]">
+                {dataa[i].subjectname}
+              </h1>
+              <h1 className="relative m-[0.5vw] text-[white] font-light text-[1vw]">
+                Creator: {dataa[i].adminname}
+              </h1>
+            </div>
           </button>
         </div>
       </div>
