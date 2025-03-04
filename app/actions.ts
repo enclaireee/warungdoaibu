@@ -9,10 +9,9 @@ export const signUpAction = async (formData: FormData) => {
   const username = formData.get("username")?.toString();
   const email = formData.get("email")?.toString();
   const password = formData.get("password")?.toString();
-  const role = Number(formData.get("role"));
+  const role = formData.get("role");
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
-  const roleString = (role == 0) ? "admin" : "student";
 
   console.log(`username: ${username}`);
   console.log(`email: ${email}`);
@@ -31,7 +30,7 @@ export const signUpAction = async (formData: FormData) => {
     email,
     password,
     options: {
-      emailRedirectTo: `${origin}/auth/callback?role=${roleString}`,
+      emailRedirectTo: `${origin}/auth/callback?role=${role}`,
     },
   });
 
@@ -45,7 +44,7 @@ export const signUpAction = async (formData: FormData) => {
         id: userId,
         email: authData?.user?.email,
         name: username,
-        role: roleString,
+        role: role,
       }
     ])
 
