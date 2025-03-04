@@ -1,7 +1,6 @@
 'use client';
-import React from 'react'
+import React, { Suspense } from 'react'
 import { signInAction, signUpAction } from "@/app/actions";
-import { FormMessage, Message } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,10 +8,17 @@ import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from "next/navigation";
 
-const page = () => {
+const ErrorMessage = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const error = searchParams.get("error");
+  if (!error) return null;
+  return <h1 className="relative text-[1.5vw] text-center text-[white]">
+    {error}
+  </h1>
+}
+
+const page = () => {
+  const router = useRouter();
   return (
     <div className="bg-cover bg-[black] min-h-full w-full justify-items-center">
       <form>
@@ -41,9 +47,9 @@ const page = () => {
         </div>
       </form>
 
-      {error && <h1 className="relative text-[1.5vw] text-center text-[white]">
-        {error}
-      </h1>}
+      <Suspense fallback={null}>
+        <ErrorMessage/>
+      </Suspense>
     </div>
   )
 }
