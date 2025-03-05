@@ -9,7 +9,7 @@ import IconNilai from '@/components/icons/mail';
 import IconSearch from '@/components/icons/magnify';
 import Image from 'next/image';
 import picture from '@/components/icons/picture.png';
-import pattern from '@/components/icons/Pattern.png'
+import pattern from '@/components/icons/Pattern.png';
 
 
 const page = () => {
@@ -173,22 +173,28 @@ const page = () => {
             </button>
           </div>
 
-          <div className="col-span-2 border-2 p-2 border-black justify-items-center bg-gradient-to-r from-[#DC82DC] via-[#A6D8AF] via-50% via-[#7BCCBA] to-[#7DD1E0] rounded-[25px] flex items-center justify-center gap-5">
-            <IconNilai className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10"/>
-            <h1 className="text-xl sm:text-3xl lg:text-4xl text-black font-bold">
-              Nilai !!
+          <div className="col-span-2 border-2 p-2 sm:p-3 md:p-4 border-black justify-items-center bg-gradient-to-r from-[#DC82DC] via-[#A6D8AF] via-50% via-[#7BCCBA] to-[#7DD1E0] rounded-[15px] sm:rounded-[20px] md:rounded-[25px] flex items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+            <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 flex items-center">
+                <IconNilai className="w-full h-full" />
+            </div>
+            <h1 className="text-sm sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-black font-bold flex items-center">
+                Nilai !!
             </h1>
           </div>
 
-          <div className="ml-[10px]  flex justify-start gap-2 rounded-[10px] self-center p-3 bg-white opacity-50  sm:ml-[20px]">
-            <IconSearch className="flex-shrink-0 h-4 sm:h-5" />
-            <input 
-              type="text" 
-              placeholder="Search" 
-              value={searchTerm} 
-              onChange={handleSearchChange} 
-              className="bg-transparent outline-none text-[#8A867C] w-full text-xs sm:text-sm"
-            />
+          <div className="w-full flex items-center self-center pr-2 sm:pr-4 md:pr-6">
+            <div className="bg-white opacity-50 rounded-[8px] sm:rounded-[10px] p-1.5 sm:p-2 md:p-3 lg:p-4 flex items-center gap-1 sm:gap-2 w-full max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
+              <div className="flex-shrink-0 w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 flex items-center">
+                <IconSearch className="w-full h-full" />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Search" 
+                value={searchTerm} 
+                onChange={handleSearchChange} 
+                className="bg-transparent outline-none text-[#8A867C] w-full min-w-[60px] text-[10px] xs:text-xs sm:text-sm md:text-base px-0.5 sm:px-1"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -199,7 +205,7 @@ const page = () => {
           backgroundRepeat: 'repeat',
           marginTop: '-1px'
         }}>
-          <div className="mt-[40px] w-[300px] sm:w-[400px] md:w-[600px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px] ">
+          <div className="mt-[5px] sx:mt-[10px] sm:mt-[20px] md:mt-[30px] w-[300px] sm:w-[400px] md:w-[600px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px] ">
             {subjectsWithQuizzes}
           </div>
       </div>
