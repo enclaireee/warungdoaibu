@@ -84,7 +84,7 @@ export const signInAction = async (formData: FormData) => {
   if (data?.role == "admin") {
     return redirect("/admin");
   } else {
-    return redirect("/student");
+    return redirect("/menu");
   }
 };
 
