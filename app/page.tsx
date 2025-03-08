@@ -5,6 +5,7 @@ import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Header } from "@/components/header"
 import { PatternBackground } from "@/components/pattern-background"
+import { useRouter } from "next/navigation"
 
 const cards = [
   {
@@ -16,6 +17,7 @@ const cards = [
     buttonText: "Take a quiz",
     imageSrc: "/gambs.png", 
     imageAlt: "Quiz mascot",
+    link: "/login",
     description:
       "The 'Ready, Set, Quiz!' function takes users straight into a collection of fully published quizzes, all of which are multiple-choice. It's designed for quick, straightforward gameplay where users can test their knowledge and get instant results.",
     features: [
@@ -33,6 +35,7 @@ const cards = [
     buttonColor: "bg-[#98FB98] hover:bg-[#85e085]",
     buttonText: "Review & Master",
     imageSrc: "/gambar.png", 
+    link: "/login",
     imageAlt: "Review mascot",
     description:
       "The 'Dive Into Review' function allows users to quickly check the correct answers after completing a quiz. Unlike detailed feedback or explanations, this feature simply reveals the right answers without any additional context.",
@@ -49,6 +52,7 @@ const cards = [
     color: "from-[#98FB98] via-[#FAFAD2] to-[#FF6B6B]",
     buttonColor: "bg-[#F0E68C] hover:bg-[#dfd37e]",
     buttonText: "Find out",
+    link: "/login",
     imageSrc: "/image.png", 
     imageAlt: "Scores mascot",
     description:
@@ -62,6 +66,7 @@ const cards = [
 ]
 
 export default function Home() {
+  const router = useRouter();
   const [activeIndex, setActiveIndex] = useState(0)
 
   const nextSlide = () => {
@@ -100,6 +105,7 @@ export default function Home() {
                       {card.subtitle && <p className="text-lg font-pixel text-gray-700">{card.subtitle}</p>}
                       <button
                         className={`px-6 py-3 ${card.buttonColor} text-black font-pixel rounded-xl border-2 border-black transition-colors`}
+                        onClick={() => card.link ? router.push(card.link) : console.warn("No link provided")}
                       >
                         {card.buttonText}
                       </button>
@@ -157,6 +163,7 @@ export default function Home() {
               </div>
               <button
                 className={`px-8 py-3 ${card.buttonColor} text-black font-pixel rounded-xl border-2 border-black transition-colors`}
+                onClick={() => card.link ? router.push(card.link) : console.warn("No link provided")}
               >
                 {card.buttonText}
               </button>
