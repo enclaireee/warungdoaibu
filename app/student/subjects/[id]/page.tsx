@@ -1,139 +1,179 @@
 "use client"
-import { createClient } from "@/utils/supabase/client";
-import { redirect, useRouter } from "next/navigation";
-import React from 'react';
-import { useParams } from 'next/navigation';
-import { addQuiz, signUpAction } from "@/app/actions";
-import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
-import { SubmitButton } from "@/components/submit-button";
-import { Label } from "@/components/ui/label";
-import { data } from "autoprefixer";
 
-const page = () => {
-  const params = useParams();
-  const router = useRouter();
-  interface SubjectType {
-    id: string,
-    name: string
-  }
+import { createClient } from "@/utils/supabase/client"
+import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
+import Image from "next/image"
 
-  interface Quiz {
-    id: string;
-    subject_id: string;
-    title: string;
-    description: string;
-    is_published: boolean;
-    created_at: string;
-  }
+interface Question {
+  id: string
+  quiz_id: string
+  question_text: string
+  options: {
+    id: string
+    text: string
+    is_correct: boolean
+  }[]
+}
 
-  const [user, setUser] = useState<any | null>(null);
-  const [dataQuiz, setDataQuiz] = useState<Quiz[]>([]);
-  const [subject, setSubject] = useState<SubjectType>();
-  const supabase = createClient();
+const QuizPage = () => {
+  const params = useParams()
+  const router = useRouter()
+  const supabase = createClient()
+
+  const [user, setUser] = useState<any | null>(null)
+  const [quizTitle, setQuizTitle] = useState<string>("")
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
 
   useEffect(() => {
     async function fetchUser() {
-      const { data: { user }, error: err } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: err,
+      } = await supabase.auth.getUser()
+
       if (!user) {
-        console.log(err);
-        router.push("/login");
+        console.log(err)
+        router.push("/login")
       } else {
-        setUser(user);
-        const { data: userData } = await supabase.from("users").select("*").eq("email", user?.email).single();
-        if (userData) {
-          if (userData.role == "admin") {
-            router.push("/login");
-          }
-        }
+        setUser(user)
       }
     }
 
-    fetchUser();
-  }, []);
+    fetchUser()
+  }, [])
 
   useEffect(() => {
-    async function getSubject() {
-      const { data: quizs } = await supabase.from("subjects").select("*").eq("id", params.id).single();
-      if (quizs) {
-        setSubject(quizs);
+    async function fetchQuizData() {
+      if (!user) return
+
+      // Fetch quiz details
+      const { data: quizData, error: quizError } = await supabase
+        .from("quizzes")
+        .select("*")
+        .eq("id", params.quizId)
+        .single()
+
+      if (quizError) {
+        console.error("Error fetching quiz:", quizError)
+        return
       }
+      setQuizTitle(quizData.title)
+
+      const { data: questionsData, error: questionsError } = await supabase
+        .from("questions")
+        .select(`
+          id,
+          quiz_id,
+          question_text,
+          options (
+            id,
+            text,
+            is_correct
+          )
+        `)
+        .eq("quiz_id", params.quizId)
+
+      if (questionsError) {
+        console.error("Error fetching questions:", questionsError)
+        return
+      }
+      setQuestions(questionsData || [])
     }
 
-    getSubject();
-  }, [user]);
+    fetchQuizData()
+  }, [user, params.quizId])
 
-  useEffect(() => {
-    async function getDataQuiz() {
-      if (!user) return;
+  const handleAnswerSelect = (questionId: string, optionId: string) => {
+    setSelectedAnswers((prev) => ({
+      ...prev,
+      [questionId]: optionId,
+    }))
+  }
 
-      const { data, error } = await supabase.rpc('get_quizzes', {
-        subjectid: subject?.id,
-        studentid: user?.id,
-      });
-
-      if (error) {
-        alert('Supabase RPC Error:' + JSON.stringify(error, null, 2));
-      } else {
-        setDataQuiz(data);
-      }
-    }
-
-    getDataQuiz();
-  }, [subject]);
-
-  const dataa: Quiz[] = dataQuiz ?? [];
-  const quizzes = Array.from({ length: dataa.length }, (_, i) => {
-    return (
-      <div key={i} className="justify-items-center">
-        <div className="relative bg-transparent min-h-auto max-h-[9.5vw] w-[35vw]">
-          <button
-            onClick={() => router.push(`/student/subjects/${subject?.id}/${dataa[i].id}`)}
-            className="relative left-1/2 transform -translate-x-1/2 flex flex-col mt-[1vw] rounded-[2vw] mih-h-auto max-h-[9.5vw] w-[35vw] bg-[grey] opacity-[90%] hover:opacity-[100%]">
-            <h1 className="relative m-[0.5vw] text-[white] font-bold text-[2vw]">
-              {dataa[i].title}
-            </h1>
-            <h2 className="relative text-left mx-[1vw] mb-[1vw] text-[1vw] scroll-container font-light text-[white]">
-              {dataa[i].description}
-            </h2>
-          </button>
-        </div>
-      </div>
-
-    );
-  });
+  const submitAnswers = async () => {
+    console.log("Submitting answers:", selectedAnswers)
+    router.push(`/student/subjects/${params.id}`)
+  }
 
   return (
-    <div className="bg-cover justify-items-center bg-[black] min-h-full w-full">
-      <button
-        onClick={() => router.push(`/student/subjects/`)}
-        className="absolute font-light text-[white] left-[5vw] top-[3vw] text-[1vw] opacity-[90%] hover:opacity-[100%] rounded-[2vw] bg-[#007bff] h-[3vw] w-[5vw]"
-      >
-        Back
-      </button>
-      <div className="relative bg-transparent top-[1vw] h-[40vw] w-[60vw] mt-[2vw]">
-        <div className="relative bg-transparent h-[6vw] w-full top-0">
-          <div className="relative justify-items-center bg-transparent h-[7vw] w-full">
-            <h1 className="relative text-[3vw] top-0 mt-[0.5vw] text-[white] font-bold">
-              {subject?.name}
+    <div className="relative min-h-screen w-full overflow-auto bg-[#7ba3f3]">
+      <div
+        className="absolute inset-0 w-full h-full bg-repeat opacity-30 z-0"
+        style={{
+          backgroundImage: "url('/Patterns.png')",
+          backgroundSize: "500px",
+        }}
+      />
+
+      <div className="relative z-10 pt-4 px-4 pb-16">
+        <button
+          onClick={() => router.push(`/student/subjects/${params.id}`)}
+          className="absolute font-light text-white left-4 top-4 text-base opacity-90 hover:opacity-100 rounded-full bg-[#007bff] h-10 w-16 md:h-12 md:w-20"
+        >
+          Back
+        </button>
+
+        <div className="flex justify-center items-center mt-8 mb-6">
+          <div className="bg-[#a8f5a2] rounded-full py-2 px-8 shadow-md">
+            <h1 className="text-2xl md:text-3xl font-bold text-black flex items-center">
+              <span className="mr-2">📚</span> Quiz {quizTitle}
             </h1>
           </div>
+        </div>
 
-          <div className="relative mt-[1vw] flex bg-transparent w-full h-[30vw]">
-            <div className="relative border-[white] left-1/2 transform -translate-x-1/2 border-[0.5vw] flex flex-col mt-[1vw] h-[30vw] w-[40vw] bg-transparent">
-              <h1 className="sticky m-[0.5vw] text-[white] text-[2vw]">
-                Available Quizzes
-              </h1>
+        <div className="max-w-md mx-auto space-y-8 mt-8">
+          {questions.map((question, index) => (
+            <div key={question.id} className="relative">
+              <div
+                className="rounded-3xl overflow-hidden shadow-lg"
+                style={{
+                  background: "linear-gradient(135deg, #f5a2f5 0%, #a2a8f5 100%)",
+                }}
+              >
+                <div className="p-6">
+                  <h2 className="text-2xl font-bold mb-2 text-black">Soal {index + 1}</h2>
+                  <p className="text-lg mb-4 text-black">{question.question_text}</p>
 
-              <div className="relative flex left-1/2 transform -translate-x-1/2 flex-col scroll-container h-[23vw] w-[36.5vw] bg-transparent">
-                {quizzes}
+                  <div className="grid grid-cols-2 gap-4">
+                    {question.options.map((option, optIndex) => (
+                      <div
+                        key={option.id}
+                        onClick={() => handleAnswerSelect(question.id, option.id)}
+                        className={`cursor-pointer p-2 rounded-lg transition-colors ${
+                          selectedAnswers[question.id] === option.id
+                            ? "bg-[#007bff] text-white"
+                            : "hover:bg-[#e0e0e0]"
+                        }`}
+                      >
+                        <p className="text-lg font-medium">
+                          {String.fromCharCode(65 + optIndex)}. {option.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
+
+        {questions.length > 0 ? (
+          <div className="max-w-md mx-auto mt-8 flex justify-center">
+            <button
+              onClick={submitAnswers}
+              className="bg-[#f5d28e] hover:bg-[#f5c56e] text-black font-bold py-2 px-6 rounded-full shadow-md"
+            >
+              Submit Answers
+            </button>
+          </div>
+        ) : 
+        <div className="flex items-center justify-center rounded-lg w-full h-full"> "No Questions Available" </div>}
       </div>
     </div>
   )
 }
 
-export default page
+export default QuizPage
