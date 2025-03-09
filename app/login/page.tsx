@@ -30,7 +30,6 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Convert to FormData object
     const form = new FormData()
     form.append("email", formData.email)
     form.append("password", formData.password)

@@ -173,7 +173,7 @@ const page = () => {
             </button>
           </div>
 
-          <div className="col-span-2 border-2 p-2 sm:p-3 md:p-4 border-black justify-items-center bg-gradient-to-r from-[#DC82DC] via-[#A6D8AF] via-50% via-[#7BCCBA] to-[#7DD1E0] rounded-[15px] sm:rounded-[20px] md:rounded-[25px] flex items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
+          <div className="col-span-2 border-2 p-2 sm:p-3 md:p-4 border-black justify-items-center bg-gradient-to-r from-[#DC82DC] via-50% via-[#7BCCBA] to-[#7DD1E0] rounded-[15px] sm:rounded-[20px] md:rounded-[25px] flex items-center justify-center gap-2 sm:gap-3 md:gap-4 lg:gap-5">
             <div className="flex-shrink-0 w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-10 lg:h-10 flex items-center">
                 <IconNilai className="w-full h-full" />
             </div>
