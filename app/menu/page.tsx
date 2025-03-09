@@ -1,271 +1,238 @@
-"use client"; 
-import React, { useState, useRef } from "react";
-import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaArrowLeft, FaArrowRight, FaAngleDoubleDown } from "react-icons/fa";
+"use client";
 
-// Menu items data
-const menuItems = [
-  {
-    src: "/menu/CEK SKOR.svg",
-    alt: "Cek Skor",
-    buttonText: "Find Out",
-    buttonColor: "bg-[#F4EBA7]",
-    outlineColor: "border-[#B47C57]",
-  },
-  {
-    src: "/menu/REDY SET QUIZ.svg",
-    alt: "Ready Set Quiz",
-    buttonText: "Take a Quiz",
-    buttonColor: "bg-[#C0E9EF]",
-    outlineColor: "border-[#90AFF7]",
-  },
-  {
-    src: "/menu/REV.svg",
-    alt: "Rev",
-    buttonText: "Review & Master",
-    buttonColor: "bg-[#DCFFA4]",
-    outlineColor: "border-[#A7F386]",
-  },
-];
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+import { redirect } from "next/navigation";
+import Image from "next/image"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { Header } from "@/components/header"
+import { PatternBackground } from "@/components/pattern-background"
+import Link from "next/link"
+import { User } from "lucide-react"
 
-// Feature details data
-const featureDetails = [
+const cards = [
   {
-    title: "Dive Into Review!",
-    subtitle: [
-      "The 'Dive Into Review' function allows users to quickly check the correct answers after completing a quiz. Unlike detailed feedback or explanations, this feature simply reveals the right answers without any additional context.",
-      "Key Features:",
-    ],
-    keyFeatures: [
-      "Instant Answer Reveal — See which answers were correct",
-      "No Explanations — Only the correct choices are displayed",
-      "Quick & Simple — Ideal for users who just want to verify answers without deep analysis",
-    ],
-    conclusion:
-      "This function is great for fast review, but for deeper learning, users might need a more detailed explanation-based review mode.",
-    buttonText: "Review & Master",
-    buttonColor: "bg-[#DCFFA4]",
-    outlineColor: "border-[#A7F386]",
-    featureId: "dive-into-review",
-    navText: "Dive Into Review!",
-  },
-  {
+    id: 1,
     title: "Ready, Set, Quiz!",
-    subtitle: [
+    subtitle: "Test your knowledge!",
+    color: "from-[#FFF8DC] via-[#FFEFD5] to-[#87CEEB]",
+    buttonColor: "bg-[#87CEEB] hover:bg-[#75bcd6]",
+    buttonText: "Take a quiz",
+    imageSrc: "/gambs.png",
+    imageAlt: "Quiz mascot",
+    link: "/student/subjects/",
+    description:
       "The 'Ready, Set, Quiz!' function takes users straight into a collection of fully published quizzes, all of which are multiple-choice. It's designed for quick, straightforward gameplay where users can test their knowledge and get instant results.",
-      "Key Features:",
+    features: [
+      "Fully Published Quizzes – Only completed and ready-to-play quizzes are available.",
+      "Multiple-Choice Only – No written answers, just quick selections.",
+      "Instant Feedback – Users get results immediately after answering.",
+      "Fast & Fun – Jump right in without any setup or waiting.",
     ],
-    keyFeatures: [
-      "Fully Published Quizzes — Only completed and ready-to-play quizzes are available",
-      "Multiple-Choice Only — No written responses, just quick selections",
-      "Instant Feedback — See immediately if your answers are correct or incorrect",
-      "Fast & Fun — Jump right in without any setup or waiting",
-    ],
-    conclusion: "Perfect for users who want a smooth, no-hassle quiz experience",
-    buttonText: "Take a Quiz",
-    buttonColor: "bg-[#C0E9EF]",
-    outlineColor: "border-[#90AFF7]",
-    featureId: "ready-set-quiz",
-    navText: "Ready, Set, Quiz!",
   },
   {
-    title: "Check your scores!",
-    subtitle: [
-      "The 'Check Your Scores!' function allows users to quickly view their quiz results. It provides a simple way to see their final score without any breakdowns or answer reviews.",
-      "Key Features:",
+    id: 2,
+    title: "Dive Into Review!",
+    subtitle: "Refresh your memory",
+    color: "from-[#E0FFFF] via-[#98FB98] to-[#90EE90]",
+    buttonColor: "bg-[#98FB98] hover:bg-[#85e085]",
+    buttonText: "Review & Master",
+    link: "/student/review/",
+    imageSrc: "/gambar.png",
+    imageAlt: "Review mascot",
+    description:
+      "The 'Dive Into Review' function allows users to quickly check the correct answers after completing a quiz. Unlike detailed feedback or explanations, this feature simply reveals the right answers without any additional context.",
+    features: [
+      "Instant Answers – See which answers were correct.",
+      "No Explanations – Only the correct choices are displayed.",
+      "Quick & Simple – Ideal for users who just want to verify answers without deep analysis.",
     ],
-    keyFeatures: [
-      "Real-Time Score Display — See your total score immediately",
-      "No Answer Review — Only shows the final result, not which answers were right or wrong",
-      "Quick & Simple — Ideal for users who just want to check their performance at a glance",
-    ],
-    conclusion:
-      "This function is perfect for those who want a fast way to track their progress without diving into details.",
-    buttonText: "Find Out",
-    buttonColor: "bg-[#F4EBA7]",
-    outlineColor: "border-[#B47C57]",
-    featureId: "check-scores",
-    navText: "Check Your Scores!",
   },
-];
+  {
+    id: 3,
+    title: "Check your scores!",
+    subtitle: "See how you did",
+    color: "from-[#98FB98] via-[#FAFAD2] to-[#FF6B6B]",
+    buttonColor: "bg-[#F0E68C] hover:bg-[#dfd37e]",
+    buttonText: "Find out",
+    link: "/student/score/",
+    imageSrc: "/image.png",
+    imageAlt: "Scores mascot",
+    description:
+      "The 'Check Your Scores!' function allows users to quickly view their quiz results. It provides a simple way to see their final score without any breakdowns or answer reviews.",
+    features: [
+      "Instant Score Display – See your total score immediately.",
+      "No Answer Review – Only shows the final result, not which answers were right or wrong.",
+      "Quick & Simple – Ideal for users who just want to check their performance at a glance.",
+    ],
+  },
+]
 
-// Main component
-const Menu: React.FC = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const nextSectionRef = useRef<HTMLDivElement>(null);
+interface Subject {
+  subyek_id: string;
+  subyek_name: string;
+}
 
-  // Handle slide left or right
-  const handleSlide = (direction: "left" | "right") => {
-    setActiveIndex((prev) =>
-      direction === "left"
-        ? prev > 0
-          ? prev - 1
-          : menuItems.length - 1
-        : prev < menuItems.length - 1
-        ? prev + 1
-        : 0
-    );
-  };
+export default function Page() {
+  const router = useRouter();
+  const supabase = createClient();
 
-  // Scroll to the next section
-  const handleScrollDown = () => {
-    nextSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [user, setUser] = useState<any | null>(null);
+  const [dataSubject, setDataSubject] = useState<Subject[]>([]);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        console.log(error);
+        router.push("/login");
+      } else {
+        setUser(user);
+
+        const { data: userData } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", user.email)
+          .single();
+
+        if (userData?.role === "admin") {
+          router.push("/login");
+        }
+      }
+    }
+    fetchUser();
+  }, [router, supabase]);
+
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  const nextSlide = () => {
+    setActiveIndex((prev) => (prev === cards.length - 1 ? 0 : prev + 1))
+  }
+
+  const prevSlide = () => {
+    setActiveIndex((prev) => (prev === 0 ? cards.length - 1 : prev - 1))
+  }
 
   return (
-    <div className="w-full">
-      {/* Section 1: Coverflow Menu (Swiper) */}
-      <section className="relative w-full h-screen flex items-center justify-center bg-[#ffeceff5]">
-        <div className="relative w-full max-w-6xl h-[600px] flex items-center justify-center">
-          <AnimatePresence mode="popLayout">
-            {menuItems.map((item, index) => {
-              const totalItems = menuItems.length;
-              const relativePosition = (index - activeIndex + totalItems) % totalItems;
+    <main className="min-h-screen bg-white text-gray-800 overflow-x-hidden">
+      <PatternBackground />
+      <header className="fixed top-0 w-full z-50">
+        <div className="h-16 bg-gradient-to-r from-blue-200 via-green-200 to-pink-300 rounded-b-xl shadow-md">
+          <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="relative w-12 h-12">
+                <Image src="/buaya-darmuh.png" alt="Dinosaur mascot" fill className="object-contain" priority />
+              </div>
+            </div>
 
-              let xPosition = 0,
-                scale = 1,
-                zIndex = 1,
-                rotateY = 0;
 
-              if (relativePosition === 0) {
-                xPosition = 0;
-                scale = 1.2;
-                zIndex = 10;
-                rotateY = 0;
-              } else if (relativePosition === 1) {
-                xPosition = 250;
-                scale = 0.8;
-                zIndex = 5;
-                rotateY = -30;
-              } else if (relativePosition === totalItems - 1) {
-                xPosition = -250;
-                scale = 0.8;
-                zIndex = 5;
-                rotateY = 30;
-              }
+            <div className="flex items-center gap-6">
+              <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
+                <Image src="/Bel.png" alt="Notifications" width={24} height={24} />
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
+                <Image src="/Buku-solawat.png" alt="Book" width={24} height={24} />
+              </button>
+              <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
+                <Image src="/Pencil.png" alt="Pencil" width={24} height={24} />
+              </button>
+              <h1 className="text-3xl md:text-xl font-pixel leading-relaxed text-green-500">
+                {user?.email}
+              </h1>
+            </div>
+          </div>
+        </div>
+      </header>
+      <section className="pt-16 px-4 max-w-7xl mx-auto relative">
+        <div className="overflow-hidden py-12">
+          <div className="relative h-[400px] flex items-center justify-center">
+            {cards.map((card, index) => {
+              const position = index - activeIndex
 
               return (
-                <motion.div
-                  key={item.src}
-                  initial={{ x: xPosition, scale, rotateY, zIndex }}
-                  animate={{ x: xPosition, scale, rotateY, zIndex }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className={`absolute flex items-center justify-center w-[80%] max-w-[530px] origin-center rounded-full bg-transparent
-                    ${scale < 1 ? "backdrop-blur-md opacity-50" : "opacity-100"}`}
+                <div
+                  key={card.id}
+                  className={`absolute w-[350px] md:w-[600px] transition-all duration-500 ease-in-out 
+                  ${position === 0 ? "z-20 transform-none opacity-100" : ""}
+                  ${position < 0 ? "-translate-x-[55%] opacity-40 blur-sm z-10" : ""}
+                  ${position > 0 ? "translate-x-[55%] opacity-40 blur-sm z-10" : ""}`}
                 >
-                  <div className="relative">
-                    <Image
-                      src={item.src}
-                      alt={item.alt}
-                      width={600}
-                      height={600}
-                      className={`object-contain shadow-xl pointer-events-none rounded-3xl transition-all duration-300 
-                        ${scale < 1 ? "backdrop-blur-lg" : "blur-none"}`}
-                    />
-                    <button
-                      className={`absolute bottom-5 left-5 px-4 py-2 text-sm ${item.buttonColor} text-black font-medium rounded-xl border-4 
-                        ${item.outlineColor} w-full max-w-[150px] transition-all duration-300
-                        ${scale < 1 ? "opacity-50 cursor-not-allowed" : "opacity-100"}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        alert(`Button clicked for: ${item.alt}`);
-                      }}
-                      disabled={scale < 1}
-                    >
-                      {item.buttonText}
-                    </button>
+                  <div
+                    className={`p-8 bg-gradient-to-br ${card.color} rounded-[2rem] shadow-lg h-[300px] flex justify-between relative overflow-hidden`}
+                  >
+                    <div className="w-1/2 space-y-4 z-10">
+                      <h2 className="text-3xl md:text-4xl font-pixel leading-relaxed">{card.title}</h2>
+                      {card.subtitle && <p className="text-lg font-pixel text-gray-700">{card.subtitle}</p>}
+                      <button
+                        className={`px-6 py-3 ${card.buttonColor} text-black font-pixel rounded-xl border-2 border-black transition-colors`}
+                        onClick={() => card.link ? router.push(card.link) : console.warn("No link provided")}
+                      >
+                        {card.buttonText}
+                      </button>
+                    </div>
+
+                    <div className="absolute right-8 bottom-0 my-[1.5vw] w-[250px] h-[250px] flex items-end justify-center">
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={card.imageSrc || "/placeholder.svg"}
+                          alt={card.imageAlt}
+                          fill
+                          className="object-contain object-bottom"
+                          priority
+                        />
+                      </div>
+                    </div>
                   </div>
-                </motion.div>
-              );
+                </div>
+              )
             })}
-          </AnimatePresence>
-
-          {/* Navigation Buttons */}
-          <div className="absolute top-1/2 transform -translate-y-1/2 flex justify-between w-full px-72 z-20">
             <button
-              onClick={() => handleSlide("left")}
-              className="bg-[#D9D9D9] text-white rounded-full p-3 shadow-lg hover:bg-[#929292] transition-all"
+              onClick={prevSlide}
+              className="absolute left-4 z-30 p-3 rounded-full bg-white/80 backdrop-blur-sm shadow-lg"
+              aria-label="Previous slide"
             >
-              <FaArrowLeft size={24} />
+              <ChevronLeft className="w-8 h-8" />
             </button>
             <button
-              onClick={() => handleSlide("right")}
-              className="bg-[#D9D9D9] text-white rounded-full p-3 shadow-lg hover:bg-[#929292] transition-all"
+              onClick={nextSlide}
+              className="absolute right-4 z-30 p-3 rounded-full bg-white/80 backdrop-blur-sm shadow-lg"
+              aria-label="Next slide"
             >
-              <FaArrowRight size={24} />
+              <ChevronRight className="w-8 h-8" />
             </button>
           </div>
         </div>
-
-        {/* Scroll Down Icon */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-gray-700 cursor-pointer"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-          onClick={handleScrollDown}
-        >
-          <FaAngleDoubleDown size={50} className="text-white" />
-        </motion.div>
       </section>
 
-      <section ref={nextSectionRef} className="w-full min-h-screen relative bg-white text-black">
-        <div className="container mx-auto px-4 py-6 relative z-10">
-          <div className="flex flex-col md:flex-row">
-            {/* Left Sidebar */}
-            <div className="w-full md:w-1/6 bg-[#C0F4E8] p-6 rounded-lg shadow-md my-8 md:my-10 md:mx-10">
-              {featureDetails.map((feature) => (
-                <div key={feature.featureId} className="mb-8">
-                  <h3 className="font-bold text-md mb-2">{feature.navText}</h3>
-                  <div className="text-sm mb-10">What is it</div>
-                  <div className="text-sm mb-20">Key Features</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Divider Line */}
-            <div className="hidden md:block w-px bg-gray-400 mx-4"></div>
-
-            {/* Right Main Content */}
-            <div className="w-full md:w-3/4 mx-10 my-10 relative z-10">
-              <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-0 w-full h-1/2">
-                  <Image src="/menu/pattern.svg" alt="Pattern" layout="fill" objectFit="contain" />
-                </div>
-                <div className="absolute bottom-0 w-full h-1/2">
-                  <Image src="/menu/pattern-1.svg" alt="Pattern" layout="fill" objectFit="contain" />
-                </div>
+      <section className="px-4 max-w-7xl mx-auto pb-20">
+        <div className="space-y-16">
+          {cards.map((card) => (
+            <div key={card.id} className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 space-y-4">
+              <h2 className="text-4xl font-pixel">{card.title}</h2>
+              <p className="text-gray-800 font-description">{card.description}</p>
+              <div className="space-y-2">
+                <h3 className="font-pixel text-lg">Key Features:</h3>
+                <ul className="space-y-1 font-description">
+                  {card.features.map((feature, index) => (
+                    <li key={index}>• {feature}</li>
+                  ))}
+                </ul>
               </div>
-              {featureDetails.map((feature, index) => (
-                <div key={feature.featureId} className="mb-12 pb-8 border-b border-gray-200 last:border-b-0">
-                  <h2 className="text-2xl font-bold mb-4 font-mono">{feature.title}</h2>
-                  <div className="text-sm mb-4">
-                    <p>{feature.subtitle[0]}</p>
-                    <p className="mt-2">{feature.subtitle[1]}</p>
-                  </div>
-
-                  <ul className="list-disc pl-5 mb-6 text-sm space-y-1">
-                    {feature.keyFeatures.map((keyFeature, i) => (
-                      <li key={i}>{keyFeature}</li>
-                    ))}
-                  </ul>
-                  <p className="text-sm mb-4">{feature.conclusion}</p>
-                  <div>
-                    <button
-                      className={`px-4 py-2 text-sm text-black font-medium rounded-xl border-4 
-          ${feature.buttonColor} ${feature.outlineColor} w-full max-w-[150px] transition-all duration-300`}
-                    >
-                      {feature.buttonText}
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <button
+                className={`px-8 py-3 ${card.buttonColor} text-black font-pixel rounded-xl border-2 border-black transition-colors`}
+                onClick={() => card.link ? router.push(card.link) : console.warn("No link provided")}
+              >
+                {card.buttonText}
+              </button>
             </div>
-          </div>
+          ))}
         </div>
       </section>
-    </div>
-  );
-};
-
-export default Menu;
+    </main>
+  )
+}

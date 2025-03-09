@@ -144,7 +144,7 @@ export default function Page() {
               <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
                 <Image src="/Pencil.png" alt="Pencil" width={24} height={24} />
               </button>
-              <h1 className="text-3xl md:text-sm font-pixel leading-relaxed text-green-500">
+              <h1 className="text-3xl md:text-4xl font-pixel leading-relaxed">
                 {user?.email}
               </h1>
             </div>

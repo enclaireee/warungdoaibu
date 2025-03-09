@@ -44,7 +44,6 @@ export default function Page() {
     fetchUser();
   }, [router, supabase]);
 
-  // 2. Get subjects from RPC
   useEffect(() => {
     async function getDataQuiz() {
       if (!user) return;
