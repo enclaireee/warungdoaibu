@@ -16,6 +16,7 @@ export default function Page() {
   const [user, setUser] = useState<any | null>(null);
   const [dataSubject, setDataSubject] = useState<Subject[]>([]);
 
+  // 1. Check user & role
   useEffect(() => {
     async function fetchUser() {
       const {
@@ -43,6 +44,7 @@ export default function Page() {
     fetchUser();
   }, [router, supabase]);
 
+  // 2. Get subjects from RPC
   useEffect(() => {
     async function getDataQuiz() {
       if (!user) return;
@@ -54,6 +56,7 @@ export default function Page() {
     getDataQuiz();
   }, [user, supabase]);
 
+  // 3. Map the subject list
   const subjectsList = dataSubject.map((subject) => (
     <div key={subject.subyek_id}>
       <button
@@ -85,38 +88,31 @@ export default function Page() {
         backgroundColor: "#ccff90",
       }}
     >
-
-      <div
-        className="relative flex items-center justify-between px-6 py-4"
-      >
-
+      {/* Top Bar */}
+      <div className="relative flex items-center justify-between px-6 py-4">
         <img src="/buaya-darmuh.png" alt="Frog Icon" className="w-30 h-20" />
 
-
+        {/* Center Title */}
         <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
           <div className="flex items-center">
-            <h1 className="text-4xl font-bold text-black mr-3">
-              Available Quiz
-            </h1>
-            <img
-              src="/Buku-solawat.png"
-              alt="Edit Icon"
-              className="w-6 h-6"
-            />
+            <h1 className="text-4xl font-bold text-black mr-3">Available Quiz</h1>
+            <img src="/Buku-solawat.png" alt="Edit Icon" className="w-6 h-6" />
           </div>
           <span className="text-xl text-gray-700 mt-1">Click To Proceed</span>
         </div>
       </div>
 
-
-      <div className="mt-2 mb-6">
-        {subjectsList.length > 0 ? (
-          subjectsList
-        ) : (
-          <div className="text-center text-black mt-10 text-2xl">
-            No subjects available.
-          </div>
-        )}
+      {/* Centered Container for Subjects */}
+      <div className="flex justify-center mt-2 mb-6">
+        <div className="w-full max-w-2xl">
+          {subjectsList.length > 0 ? (
+            subjectsList
+          ) : (
+            <div className="text-center text-black mt-10 text-2xl">
+              No subjects available.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
