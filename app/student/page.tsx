@@ -144,7 +144,7 @@ export default function Page() {
               <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
                 <Image src="/Pencil.png" alt="Pencil" width={24} height={24} />
               </button>
-              <h1 className="text-3xl md:text-4xl font-pixel leading-relaxed">
+              <h1 className="text-3xl md:text-xl font-pixel leading-relaxed text-green-400">
                 {user?.email}
               </h1>
             </div>
@@ -169,7 +169,6 @@ export default function Page() {
                   <div
                     className={`p-8 bg-gradient-to-br ${card.color} rounded-[2rem] shadow-lg h-[300px] flex justify-between relative overflow-hidden`}
                   >
-                    {/* Text and Button Column */}
                     <div className="w-1/2 space-y-4 z-10">
                       <h2 className="text-3xl md:text-4xl font-pixel leading-relaxed">{card.title}</h2>
                       {card.subtitle && <p className="text-lg font-pixel text-gray-700">{card.subtitle}</p>}
@@ -180,8 +179,6 @@ export default function Page() {
                         {card.buttonText}
                       </button>
                     </div>
-
-                    {/* Image Container */}
                     <div className="absolute right-8 bottom-0 my-[1.5vw] w-[250px] h-[250px] flex items-end justify-center">
                       <div className="relative w-full h-full">
                         <Image

@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react"
 import type React from "react"
 import Link from "next/link"
-import { signInAction, signUpAction } from "@/app/actions";
+import { signUpAction } from "@/app/actions";
 import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"

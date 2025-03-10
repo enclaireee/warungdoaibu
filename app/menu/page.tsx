@@ -3,13 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { redirect } from "next/navigation";
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Header } from "@/components/header"
 import { PatternBackground } from "@/components/pattern-background"
-import Link from "next/link"
-import { User } from "lucide-react"
 
 const cards = [
   {

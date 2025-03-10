@@ -1,12 +1,12 @@
 'use client'
 import { createClient } from "@/utils/supabase/client";
 import React, {Suspense} from 'react'
-import { addQuiz, signUpAction } from "@/app/actions";
+import { addQuiz } from "@/app/actions";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useParams, useSearchParams } from "next/navigation";
 
 const page = () => {

@@ -2,9 +2,6 @@
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import React, { useState, useEffect } from 'react';
-import { Input } from "@/components/ui/input";
-import { SubmitButton } from "@/components/submit-button";
-import { Label } from "@/components/ui/label";
 import IconNilai from '@/components/icons/mail';
 import IconSearch from '@/components/icons/magnify';
 import Image from 'next/image';

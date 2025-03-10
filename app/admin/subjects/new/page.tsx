@@ -1,11 +1,10 @@
 'use client'
 import React, { Suspense } from 'react';
-import { addQuiz, addSubject, signUpAction } from "@/app/actions";
+import { addSubject } from "@/app/actions";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useSearchParams } from "next/navigation";
 
 function ErrorMessage() {

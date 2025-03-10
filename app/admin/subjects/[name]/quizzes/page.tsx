@@ -1,14 +1,9 @@
 "use client"
 import { createClient } from "@/utils/supabase/client";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { addQuiz, signUpAction } from "@/app/actions";
-import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { SubmitButton } from "@/components/submit-button";
-import { Label } from "@/components/ui/label";
-import Buttons from './buttons'
 
 const page = () => {
   const params = useParams();
