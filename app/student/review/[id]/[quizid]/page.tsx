@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import pattern from '@/components/icons/Pattern.png';
+import pattern from '../components/icons/Pattern.png';
 import IconBook from '@/components/icons/book';
-import question from "@/components/icons/disc.png"
-import answer from '@/components/icons/Asnwer.png'
+import question from "../components/icons/disc.png"
+import answer from '../components/icons/Asnwer.png'
 
 export default function Page() {
     interface SubjectType {
