@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import React from 'react';
 import { useState, useEffect } from "react";
-import IconMail from '@/components/icons/mail';
+import IconMail from '@/public/mail';
 
 const page = () => {
   interface Subject {

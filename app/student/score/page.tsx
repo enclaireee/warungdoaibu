@@ -2,12 +2,9 @@
 import { createClient } from "@/utils/supabase/client";
 import { redirect } from "next/navigation";
 import React, { useState, useEffect } from 'react';
-import IconNilai from '@/components/icons/mail';
-import IconSearch from '@/components/icons/magnify';
+import IconNilai from '@/public/mail';
+import IconSearch from '@/public/magnify';
 import Image from 'next/image';
-import picture from '@/components/icons/picture.png';
-import pattern from '@/components/icons/Pattern.png';
-
 
 const page = () => {
   interface Subject {
@@ -119,8 +116,10 @@ const page = () => {
         <div key={quiz.quizid} className="h-[150px] grid grid-cols-4 gap-4 sm:mb-[25px] md:mb-[60px] mb-[5px] ">
           <div className="col-span-3 flex items-center justify-center relative">
             <Image 
-              src={picture} 
+              src="/picture.png"
               alt="Background" 
+              width={320}
+              height={160}
               className="w-[180px] sm:w-[240px] md:w-[320px] h-40 object-contain"
             />
           </div>
@@ -133,7 +132,6 @@ const page = () => {
               <span className="ml-[10px] md:ml-[15px] sm:ml-[20px]">: {quiz.quizscore}</span>
             </div>
           </div>
-          {/* ignore sikit wak, gue gatau cara kasih spasi tanpa kasih margin*/}
         </div>
       ))}
 
@@ -195,20 +193,19 @@ const page = () => {
           </div>
         </div>
       </div>
-      <div className="grid justify-items-center bg-[#CCB5FB] w-full" 
-        style={{ 
-          backgroundImage: `url(${pattern.src})`, 
-          backgroundSize: '70%',
-          backgroundRepeat: 'repeat',
-          marginTop: '-1px'
-        }}>
-          <div className="mt-[5px] sx:mt-[10px] sm:mt-[20px] md:mt-[30px] w-[300px] sm:w-[400px] md:w-[600px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px] ">
-            {subjectsWithQuizzes}
-          </div>
+      <div className="grid justify-items-center bg-[#CCB5FB] w-full relative"> 
+        <Image
+          src="/Pattern.png"
+          alt="Background pattern"
+          fill
+          className="object-contain repeat-y"
+          priority
+        />
+        <div className="relative z-10 mt-[5px] sx:mt-[10px] sm:mt-[20px] md:mt-[30px] w-[300px] sm:w-[400px] md:w-[600px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px]">
+          {subjectsWithQuizzes}
+        </div>
       </div>
-      
     </>
-    
   )
 }
 

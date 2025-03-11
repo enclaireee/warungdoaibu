@@ -8,10 +8,8 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { SubmitButton } from "@/components/submit-button";
 import { Label } from "@/components/ui/label";
-import pattern from '../components/icons/Pattern.png';
-import IconBook from '@/components/icons/book';
-import question from "../components/icons/disc.png"
-import answer from '../components/icons/Asnwer.png'
+import Image from 'next/image';
+import IconBook from "@/public/book";
 
 export default function Page() {
     interface SubjectType {
@@ -118,7 +116,6 @@ export default function Page() {
     useEffect(() => {
         const getData = async () => {
             if (!quiz_data?.id) return;
-
             const { data: questionsData, error } = await supabase.from("questions").select("id, question_text").eq("quiz_id", quiz_data.id);
             console.log("Raw Questions Data:", questionsData);
 
@@ -197,15 +194,15 @@ export default function Page() {
             <div>
 
                 {/* Question */}
-                <div className="h-auto py-3 xs:py-5 sm:py-12 md:py-[40px] mx-auto w-[320px] xs:w-[420px] sm:w-[600px] md:w-[700px]" 
-                    style={{
-                        backgroundImage: `url(${question.src})`,
-                        backgroundSize: 'contain',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center', 
-                    }}>
+                <div className="h-auto py-3 xs:py-5 sm:py-12 md:py-[40px] mx-auto w-[320px] xs:w-[420px] sm:w-[600px] md:w-[700px] relative">
+                    <Image
+                        src="/disc.png"
+                        alt="Question background"
+                        fill
+                        className="object-contain z-0"
+                    />
                     
-                    <div className="mb-4 sm:mb-6 md:mb-8 w-full text-black">
+                    <div className="mb-4 sm:mb-6 md:mb-8 w-full text-black relative z-10">
                         <div className="grid grid-cols-2 md:gap-1 gap-0 ml-[27px] xs:ml-[40px] sm:ml-[50px] md:ml-[70px]  mt-[4px] xs:mt-[0px]  md:mt-[10px] ">
                             <Label htmlFor={`Question ${i + 1}`} className="col-span-2 text-[13px] xs:text-[17px] sm:text-[20px] md:text-[25px] font-semibold">
                                 Question {i + 1}
@@ -233,15 +230,14 @@ export default function Page() {
 
                     {/* Answer */}
                 </div>         
-                <div className="mb-6 h-auto py-[10px] xs:py-[20px] sm:py-[40px] mx-auto w-[140px] xs:w-[210px] sm:w-[320px] md:w-[500px]" 
-                    style={{
-                        backgroundImage: `url(${answer.src})`,
-                        backgroundSize: 'contain',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundPosition: 'center', 
-                        paddingTop:'5px'
-                    }}>
-                    <h1 className=" justify-self-center mt-[7px] xs:mt-[15px] sm:mt-[30px] md:mt-[32px] text-black text-[10px] xs:text-[15px] sm:text-[23px] md:text-[25px]">
+                <div className="mb-6 h-auto py-[10px] xs:py-[20px] sm:py-[40px] mx-auto w-[140px] xs:w-[210px] sm:w-[320px] md:w-[500px] relative">
+                    <Image
+                        src="/answerpic.png"
+                        alt="Answer background"
+                        fill
+                        className="object-contain z-0"
+                    />
+                    <h1 className="relative z-10 justify-self-center  text-black text-[10px] xs:text-[15px] sm:text-[23px] md:text-[25px]">
                         {abcd[jawabanBenar[i]]} &nbsp; {opsi[i].opsi[jawabanBenar[i]]}
                     </h1>    
                 </div>       
@@ -294,14 +290,13 @@ export default function Page() {
             </div>
             
             <div className="justify-items-center w-full">
-                <div className="pt-2 sm:pt-0 grid justify-items-center w-full pb-20" 
-                    style={{ 
-                    backgroundImage: `url(${pattern.src})`, 
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'repeat',
-                    marginTop: '-1px'
-                    }}>
-                        <div className="mt-0 xs:mt-[10px] md:mt-[20px] w-[90%] max-w-[900px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px]">{questions}</div>
+                <div className="pt-2 sm:pt-0 grid justify-items-center w-full pb-20 relative" 
+                    style={{
+                        backgroundImage: 'url("/pattern.png")',
+                        backgroundRepeat: 'repeat',
+                    }}
+                >
+                    <div className="mt-0 xs:mt-[10px] md:mt-[20px] w-[90%] max-w-[900px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px]">{questions}</div>
                 </div>
             </div>
         </div>
