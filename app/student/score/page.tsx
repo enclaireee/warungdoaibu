@@ -193,14 +193,16 @@ const page = () => {
           </div>
         </div>
       </div>
-      <div className="grid justify-items-center bg-[#CCB5FB] w-full relative"> 
-        <Image
-          src="/Pattern.png"
-          alt="Background pattern"
-          fill
-          className="object-contain repeat-y"
-          priority
-        />
+      <div className="grid justify-items-center bg-[#CCB5FB] w-full relative min-h-screen">
+        <div className="absolute inset-0 w-full h-full">
+          <Image
+            src="/pattern.png"
+            alt="Pattern background"
+            fill
+            className="object-contain repeat-x repeat-y z-0"
+            priority
+          />
+        </div>
         <div className="relative z-10 mt-[5px] sx:mt-[10px] sm:mt-[20px] md:mt-[30px] w-[300px] sm:w-[400px] md:w-[600px] h-auto sm:mb-[50px] md:mb-[40px] mb-[20px]">
           {subjectsWithQuizzes}
         </div>
